@@ -48,10 +48,10 @@ const (
 //  1. Exchange a GitHub OAuth access_token for a short-lived Copilot API JWT
 //  2. Send requests to api.githubcopilot.com with the JWT and special headers
 type CopilotGatewayService struct {
-	httpUpstream       HTTPUpstream
-	copilotTokenProv   *CopilotTokenProvider
-	rateLimitService   *RateLimitService
-	cfg                *config.Config
+	httpUpstream     HTTPUpstream
+	copilotTokenProv *CopilotTokenProvider
+	rateLimitService *RateLimitService
+	cfg              *config.Config
 }
 
 // NewCopilotGatewayService creates a new CopilotGatewayService.
@@ -309,7 +309,11 @@ func (s *CopilotGatewayService) ListModels(ctx context.Context, account *Account
 	if err != nil {
 		return nil, fmt.Errorf("copilot: models request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if errClose := resp.Body.Close(); errClose != nil {
+			logger.L().Warn("copilot: close models response body error", zap.Error(errClose))
+		}
+	}()
 
 	respBody, err := io.ReadAll(io.LimitReader(resp.Body, 2<<20))
 	if err != nil {

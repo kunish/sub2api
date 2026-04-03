@@ -175,7 +175,10 @@ func (p *CopilotTokenProvider) GetCopilotAPIToken(ctx context.Context, githubAcc
 		return "", "", err
 	}
 
-	result := val.(*tokenResult)
+	result, ok := val.(*tokenResult)
+	if !ok {
+		return "", "", fmt.Errorf("copilot: unexpected token result type")
+	}
 	return result.token, result.apiEndpoint, nil
 }
 

@@ -18,10 +18,10 @@ import (
 // copilotHTTPUpstreamStub is a test double for HTTPUpstream that returns
 // configurable responses. It is safe for concurrent use.
 type copilotHTTPUpstreamStub struct {
-	mu       sync.Mutex
-	handler  func(req *http.Request) (*http.Response, error)
-	calls    int
-	lastReq  *http.Request
+	mu      sync.Mutex
+	handler func(req *http.Request) (*http.Response, error)
+	calls   int
+	lastReq *http.Request
 }
 
 func (s *copilotHTTPUpstreamStub) Do(req *http.Request, proxyURL string, accountID int64, accountConcurrency int) (*http.Response, error) {
@@ -38,12 +38,6 @@ func (s *copilotHTTPUpstreamStub) Do(req *http.Request, proxyURL string, account
 
 func (s *copilotHTTPUpstreamStub) DoWithTLS(req *http.Request, proxyURL string, accountID int64, accountConcurrency int, profile *tlsfingerprint.Profile) (*http.Response, error) {
 	return s.Do(req, proxyURL, accountID, accountConcurrency)
-}
-
-func (s *copilotHTTPUpstreamStub) getCalls() int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.calls
 }
 
 // makeCopilotTokenResponse creates a valid token exchange HTTP response.
